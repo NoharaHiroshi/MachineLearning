@@ -23,37 +23,37 @@ class NewImage:
     def get_pixel_color(cls, pixel):
         color_list = [
             # red
-            [1, [255, 0, 0]],
+            [[255, 0, 0], [220, 20, 60]],
             # orange
-            [2, [255, 165, 0]],
+            [[255, 165, 0]],
             # yellow
-            [3, [255, 255, 0]],
+            [[255, 255, 0]],
             # green
-            [4, [0, 128, 0]],
+            [[0, 128, 0]],
             # blue
-            [5, [0, 0, 255]],
+            [[0, 0, 255]],
             # purple
-            [6, [128, 0, 128]],
+            [[128, 0, 128]],
             # pink
-            [7, [255, 192, 203]],
+            [[255, 192, 203]],
             # brown
-            [8, [165, 42, 42]],
+            [[165, 42, 42]],
             # white
-            [9, [255, 255, 255]],
+            [[255, 255, 255]],
             # black
-            [10, [0, 0, 0]]
+            [[0, 0, 0]]
         ]
         color_range_list = []
-        for color in color_list:
-            c_r, c_g, c_b = color[1]
-            # 适用PNG
-            d_r, d_g, d_b, d_a = pixel
-            r = math.sqrt(numpy.square((c_r-d_r)) + numpy.square((c_g-d_g)) + numpy.square((c_b-d_b)))
-            color_range_list.append(int(r))
-        print color_range_list
-        min_r = min(color_range_list)
-        print min_r
-        index = color_range_list.index(min_r) + 1
+        for i, color in enumerate(color_list):
+            for color_item in color:
+                c_r, c_g, c_b = color_item
+                # 适用PNG和JPG
+                d_r, d_g, d_b = pixel[:3]
+                r = math.sqrt(numpy.square((c_r-d_r)) + numpy.square((c_g-d_g)) + numpy.square((c_b-d_b)))
+                color_range_list.append([i, int(r)])
+        sorted_color_list = sorted(color_range_list, key=lambda x: x[1])
+        print sorted_color_list
+        index = sorted_color_list[0][0]
         return index
 
 @contextlib.contextmanager
@@ -79,4 +79,4 @@ def get_image_color(img_name):
         print traceback.format_exc(e)
 
 if __name__ == '__main__':
-    print NewImage.get_pixel_color((220, 20, 60, 225))
+    print NewImage.get_pixel_color((200, 22, 68))
