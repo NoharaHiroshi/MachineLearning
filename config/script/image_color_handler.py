@@ -79,19 +79,24 @@ def get_image_color(img_name):
     try:
         with open_image(img_name) as image:
             img = image.im
-            width, height = img.size
-            color_record_dict = dict()
-            for h in range(height):
-                for w in range(width):
-                    color = img.getpixel((w, h))
-                    tag = NewImage.get_pixel_color(color)
-                    if tag not in color_record_dict:
-                        color_record_dict[tag] = 1
-                    else:
-                        color_record_dict[tag] += 1
-            print color_record_dict
+            if img.mode == 'RGBA':
+                width, height = img.size
+                color_record_dict = dict()
+                for h in range(height):
+                    for w in range(width):
+                        color = img.getpixel((w, h))
+                        # 透明通道不在统计范围内
+                        if color[-1] > 250:
+                            tag = NewImage.get_pixel_color(color)
+                            if tag not in color_record_dict:
+                                color_record_dict[tag] = 1
+                            else:
+                                color_record_dict[tag] += 1
+                print color_record_dict
+            else:
+                return
     except Exception as e:
         print traceback.format_exc(e)
 
 if __name__ == '__main__':
-    get_image_color('0_.png')
+    get_image_color('0_4d3c99dcd9d4e52895de837258ec6a69.png')
