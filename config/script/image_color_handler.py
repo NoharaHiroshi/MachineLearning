@@ -6,6 +6,7 @@ import traceback
 import contextlib
 import ImageFilter
 import ImageEnhance
+import time
 import math
 import numpy
 from PIL import Image
@@ -63,24 +64,13 @@ class NewImage:
                 tmp_tag = tag
         return tmp_tag
 
-
-@contextlib.contextmanager
-def open_image(file_name):
-    new_im = NewImage(file_name)
-    try:
-        yield new_im
-    except Exception as e:
-        print e
-    finally:
-        pass
-
-
-def get_image_color(img_name):
-    try:
-        with open_image(img_name) as image:
-            img = image.im
+    def get_image_color(self):
+        try:
+            img = self.im
             if img.mode == 'RGBA':
                 width, height = img.size
+                print u'当前像素点： %s' % (width * height)
+                start = time.time()
                 color_record_dict = dict()
                 for h in range(height):
                     for w in range(width):
@@ -92,11 +82,46 @@ def get_image_color(img_name):
                                 color_record_dict[tag] = 1
                             else:
                                 color_record_dict[tag] += 1
-                print color_record_dict
+                tmp_color = 0
+                tmp_value = 1
+                for k, v in color_record_dict.items():
+                    if v > tmp_value:
+                        tmp_color = k
+                        tmp_value = v
+                end = time.time()
+                print u'当前用时： %s s' % float((end - start))
+                return tmp_color
             else:
-                return
+                return 0
+        except Exception as e:
+            print traceback.format_exc(e)
+
+
+@contextlib.contextmanager
+def open_image(file_name):
+    new_im = NewImage(file_name)
+    try:
+        yield new_im
     except Exception as e:
-        print traceback.format_exc(e)
+        print e
+    finally:
+        pass
 
 if __name__ == '__main__':
-    get_image_color('0_4d3c99dcd9d4e52895de837258ec6a69.png')
+    d = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    img_file_dir = os.path.join(d, u'sample\image_color')
+    all_file = os.listdir(img_file_dir)
+    all_file_count = 0
+    test_success_count = 0
+    for f in all_file:
+        color_type = f.split('_')[0]
+        img = NewImage(f)
+        if img.im.mode != 'RGBA':
+            continue
+        all_file_count += 1
+        k_color_type = img.get_image_color()
+        print f, color_type, k_color_type
+        if int(k_color_type) == int(color_type):
+            test_success_count += 1
+    print u'检测文件数：%s， 匹配数： %s， 成功率： %s' % (all_file_count,
+                                           test_success_count, (float(test_success_count) / float(all_file_count)) * 100)
