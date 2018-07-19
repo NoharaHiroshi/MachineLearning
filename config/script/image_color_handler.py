@@ -64,16 +64,18 @@ class NewImage:
                 tmp_tag = tag
         return tmp_tag
 
-    def get_image_color(self):
+    def get_image_color(self, z=5):
+        # 参数z代表压缩级别
         try:
             img = self.im
             if img.mode == 'RGBA':
                 width, height = img.size
-                print u'当前像素点： %s' % (width * height)
                 start = time.time()
                 color_record_dict = dict()
-                for h in range(height):
-                    for w in range(width):
+                pixel_count = 0
+                for h in range(0, height, z):
+                    for w in range(0, width, z):
+                        pixel_count += 1
                         color = img.getpixel((w, h))
                         # 透明通道不在统计范围内
                         if color[-1] > 250:
@@ -82,6 +84,7 @@ class NewImage:
                                 color_record_dict[tag] = 1
                             else:
                                 color_record_dict[tag] += 1
+                print u'像素数量： %s' % pixel_count
                 tmp_color = 0
                 tmp_value = 1
                 for k, v in color_record_dict.items():
@@ -110,6 +113,7 @@ def open_image(file_name):
 if __name__ == '__main__':
     # 记录
     # 第一次测试： 检测文件数72，匹配率30， 准确率41.6%
+    # 第二次测试： 检测文件数72，匹配率31， 准确率43.0%， 压缩了检测像素点的数量，提高了速度，分别测试了压缩率5， 10， 20，当前样本规模差别不大
     d = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     img_file_dir = os.path.join(d, u'sample\image_color')
     all_file = os.listdir(img_file_dir)
@@ -121,7 +125,7 @@ if __name__ == '__main__':
         if img.im.mode != 'RGBA':
             continue
         all_file_count += 1
-        k_color_type = img.get_image_color()
+        k_color_type = img.get_image_color(z=10)
         print f, color_type, k_color_type
         if int(k_color_type) == int(color_type):
             test_success_count += 1
