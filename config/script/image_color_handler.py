@@ -113,7 +113,8 @@ def open_image(file_name):
 if __name__ == '__main__':
     # 记录
     # 第一次测试： 检测文件数72，匹配率30， 准确率41.6%
-    # 第二次测试： 检测文件数72，匹配率31， 准确率43.0%， 压缩了检测像素点的数量，提高了速度，分别测试了压缩率5， 10， 20，当前样本规模差别不大
+    # 第二次测试： 检测文件数72，匹配率31， 准确率43.0%， 压缩了检测像素点的数量，提高了速度
+    # 分别测试了压缩率5， 10， 20，当前样本规模差别不大
     d = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     img_file_dir = os.path.join(d, u'sample\image_color')
     all_file = os.listdir(img_file_dir)
