@@ -149,6 +149,33 @@ def my_hand_writing(data_list, k=3):
             result = result_list[0][0]
         print u'当前文件: %s, 识别为： %s' % (data_name, result)
 
+
+# 转换文本查看图片
+def hand_writing_handler():
+    weight_list = [u'▏', u'▎', u'▍', u'▌', u'▋', u'▊', u'▉', u'█']
+    base_dir = '\\'.join(os.path.abspath(__file__).split('\\')[:2])
+    file_path = '\\'.join([base_dir, r'sample\hand_number'])
+    data_data_list = os.listdir(file_path)
+    for data in data_data_list:
+        full_file_path = os.path.join(file_path, data)
+        im = Image.open(full_file_path)
+        _im = im.convert('L')
+        width, height = _im.size
+        w = 100
+        h = 100
+        _im = _im.resize((w, h))
+        for _h in range(h):
+            row = list()
+            for _w in range(w):
+                color = _im.getpixel((_w, _h))
+                color_weight = int(color // int(255 // len(weight_list)))
+                text_color = weight_list[color_weight]
+                row.append(text_color)
+            color_str = ''.join(row)
+            print color_str
+
+
 if __name__ == '__main__':
-    d_list = get_sample_list()
-    my_hand_writing(d_list)
+    # d_list = get_sample_list()
+    # my_hand_writing(d_list)
+    hand_writing_handler()
