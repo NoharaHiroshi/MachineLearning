@@ -94,6 +94,61 @@ def hand_writing():
             error_count += 1.0
         print error_count
 
-if __name__ == '__main__':
-    hand_writing()
 
+def file2vector(file_path):
+    f = open(file_path)
+    f_lines = f.readlines()
+    f_len = len(f_lines)
+    vector = zeros((f_len, f_len))
+    for i, line in enumerate(f_lines):
+        line = line.replace('\n', '')
+        for j, num in enumerate(line):
+            vector[(i, j)] = num
+    return vector
+
+
+def get_sample_list():
+    sample_data_list = list()
+    base_dir = '\\'.join(os.path.abspath(__file__).split('\\')[:2])
+    file_path = '\\'.join([base_dir, r'sample/number_data'])
+    sample_list = os.listdir(file_path)
+    for sample_name in sample_list:
+        sample_full_name = os.path.join(file_path, sample_name)
+        num_type = sample_name.split('_')[0]
+        vector = file2vector(sample_full_name)
+        sample_data_list.append([vector, num_type])
+    return sample_data_list
+
+
+def my_hand_writing(data_list, k=3):
+    base_dir = '\\'.join(os.path.abspath(__file__).split('\\')[:2])
+    file_path = '\\'.join([base_dir, r'sample\test'])
+    data_data_list = os.listdir(file_path)
+    for data_name in data_data_list:
+        data_full_name = os.path.join(file_path, data_name)
+        num_type = data_name.split('_')[0]
+        vector = file2vector(data_full_name)
+        result_list = list()
+        for data in data_list:
+            # 向量欧式距离
+            distances = sqrt(sum(square(vector - data[0])))
+            result_list.append([data[1], distances])
+        result_list = sorted(result_list, key=lambda x: x[1])[:k]
+        _result_list = [result[0] for result in result_list]
+        result_set = set(_result_list)
+        # 最大出现次数
+        tmp_max_num = 1
+        result = result_list[0][0]
+        if len(result_set) != len(_result_list):
+            for r in _result_list:
+                t_num = _result_list.count(r)
+                if t_num > tmp_max_num:
+                    tmp_max_num = t_num
+                    result = r
+        else:
+            result = result_list[0][0]
+        print u'当前文件: %s, 识别为： %s' % (data_name, result)
+
+if __name__ == '__main__':
+    d_list = get_sample_list()
+    my_hand_writing(d_list)
