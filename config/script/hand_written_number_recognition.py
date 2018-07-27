@@ -175,7 +175,35 @@ def hand_writing_handler():
             print color_str
 
 
+# 清除图片杂乱信息，获取图片内容
+def clean_hand_writing_img(img_file):
+    base_dir = '\\'.join(os.path.abspath(__file__).split('\\')[:2])
+    file_path = '\\'.join([base_dir, r'sample\hand_number'])
+    full_file_path = os.path.join(file_path, img_file)
+    im = Image.open(full_file_path)
+    _im = im.convert('L')
+    w = 100
+    h = 100
+    _im = _im.resize((w, h))
+    width, height = _im.size
+    color_dict = dict()
+    for h in range(height):
+        row = list()
+        for w in range(width):
+            color = _im.getpixel((w, h))
+            row.append(str(color))
+            if color not in color_dict:
+                color_dict[color] = 1
+            else:
+                color_dict[color] += 1
+        color_str = ' '.join(row)
+    # 对污染像素进行清洗
+    color_dirty_color = sorted(color_dict.items(), key=lambda x: x[1], reverse=True)
+    print color_dirty_color
+
+
 if __name__ == '__main__':
     # d_list = get_sample_list()
     # my_hand_writing(d_list)
-    hand_writing_handler()
+    # hand_writing_handler()
+    clean_hand_writing_img('2.jpg')
